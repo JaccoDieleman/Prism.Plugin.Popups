@@ -75,17 +75,6 @@ stages:
         arguments: -c $(BuildConfiguration) --collect:"Code Coverage" -s $(System.DefaultWorkingDirectory)/CodeCoverage.runsettings /p:DebugType=portable --no-build
       displayName: Run Tests
 
-    - powershell: ./Sign-Packages.ps1
-      workingDirectory: build
-      displayName: Authenticode Sign Artifacts
-      env:
-        SignClientUser: $(SignClientUser)
-        SignClientSecret: $(SignClientSecret)
-        SignClientClientId: $(SignClientClientId)
-        SignClientTenantId: $(SignClientTenantId)
-        SignServiceResourceId: $(SignServiceResourceId)
-      condition: and(succeeded(), not(eq(variables['build.reason'], 'PullRequest')), not(eq(variables['SignClientSecret'], '')), not(eq(variables['SignClientUser'], '')))
-
     - task: PublishPipelineArtifact@1
       displayName: Publish Package Artifacts
       inputs:
@@ -104,46 +93,7 @@ stages:
         deploy:
           steps:
           - task: NuGetCommand@2
-            displayName: NuGet Push
             inputs:
               command: push
-              packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;$(Pipeline.Workspace)/**/*.snupkg'
-              nuGetFeedType: external
-              publishFeedCredentials: 'SponsorConnect'
-
-- stage: deployNuGetOrg
-  displayName: 'Deploy to NuGet.org'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['IS_RELEASE'], 'true'))
-  jobs:
-  - deployment: NuGet
-    displayName: NuGet.org
-    environment: NuGet
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - checkout: self
-            displayName: Get Build Resources
-
-          - powershell: build/Process-Release.ps1
-            displayName: Process Artifacts for Release
-          - powershell: |
-
-            displayName: Process Artifacts for Deployment
-          - task: GitHubRelease@1
-            displayName: 'Create GitHub Release'
-            inputs:
-              gitHubConnection: GitHub
-              title: '$(ReleaseDisplayName)'
-              tag: 'v$(VersionName)'
-              isPreRelease: $(IS_PREVIEW)
-              assets: '$(Pipeline.Workspace)/**/*.nupkg;$(Pipeline.Workspace)/**/*.snupkg'
-              addChangeLog: true
-              isDraft: true
-          - task: NuGetCommand@2
-            displayName: NuGet Push
-            inputs:
-              command: push
-              packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;$(Pipeline.Workspace)/**/*.snupkg'
-              nuGetFeedType: external
-              publishFeedCredentials: 'NuGet'
+              packagesToPush: $(Pipeline.Workspace)\packages\*.nupkg
+              publishVstsFeed: Apps/FPSApps

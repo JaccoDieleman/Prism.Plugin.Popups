@@ -70,6 +70,6 @@ stages:
       displayName: Push to feed
       inputs:
         command: push
-        packagesToPush: $(Build.ArtifactStagingDirectory)/../*.nupkg
+        packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
         publishVstsFeed: Apps/FPSApps
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))

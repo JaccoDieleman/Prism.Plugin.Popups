@@ -79,7 +79,8 @@ stages:
   displayName: Deploy CI Feed
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
-  - deployment: Publish to feed
+  - deployment: PublishToFeed
+    displayName: Publish to feed
     strategy:
       runOnce:
         deploy:

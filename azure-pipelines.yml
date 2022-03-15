@@ -9,16 +9,6 @@ trigger:
     - .editorconfig
     - .gitignore
 
-pr:
-  branches:
-    include:
-    - master
-  paths:
-    exclude:
-    - README.md
-    - .editorconfig
-    - .gitignore
-
 name: 8.1.$(Build.BuildId)
 
 variables:
@@ -29,13 +19,13 @@ variables:
 
 stages:
 - stage: build
-  pool:
-    name: AppsTeam
-    demands:
-      agent.OS -equals Windows_NT
   displayName: Build NuGet Packages
   jobs:
   - job: buildJob
+    pool:
+      name: AppsTeam
+      demands:
+        agent.OS -equals Windows_NT
     displayName: Build Prism.Plugin.Popups
     steps:
     - task: UseDotNet@2
@@ -77,14 +67,14 @@ stages:
         targetPath: '$(Build.ArtifactStagingDirectory)'
       condition: and(succeeded(), eq(variables['system.pullrequest.isfork'], false))
 - stage: deploy
-  pool:
-    name: AppsTeam
-    demands:
-      agent.OS -equals Windows_NT
   displayName: Deploy CI Feed
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs: 
   - job: PushToFeed
+    pool:
+      name: AppsTeam
+      demands:
+        agent.OS -equals Windows_NT
     workspace:
       clean: all
     steps:

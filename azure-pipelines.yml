@@ -78,15 +78,14 @@ stages:
 - stage: deploy
   displayName: Deploy CI Feed
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  jobs:
-  - deployment: PublishToFeed
-    displayName: Publish to feed
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: NuGetCommand@2
-            inputs:
-              command: push
-              packagesToPush: $(Pipeline.Workspace)\packages\*.nupkg
-              publishVstsFeed: Apps/FPSApps
+  jobs: PublishToFeed
+  - job: PushToFeed
+    workspace:
+      clean: all
+    steps:
+    - download: current
+    - task: NuGetCommand@2
+      inputs:
+        command: push
+        packagesToPush: $(Pipeline.Workspace)\packages\*.nupkg
+        publishVstsFeed: Apps/FPSApps

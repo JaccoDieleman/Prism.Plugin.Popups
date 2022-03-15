@@ -37,9 +37,6 @@ stages:
   jobs:
   - job: buildJob
     displayName: Build Prism.Plugin.Popups
-    pool:
-      demands:
-      - MSBuild
     steps:
     - task: UseDotNet@2
       inputs:

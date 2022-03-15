@@ -22,8 +22,6 @@ pr:
 name: 8.1.$(Build.BuildId)
 
 variables:
-- name: VMImage
-  value: 'windows-latest'
 - name: BuildPlatform
   value: 'Any CPU'
 - name: BuildConfiguration
@@ -36,7 +34,6 @@ stages:
   - job: buildJob
     displayName: Build Prism.Plugin.Popups
     pool:
-      vmImage: $(VMImage)
       demands:
       - MSBuild
     steps:
@@ -82,9 +79,7 @@ stages:
   displayName: Deploy CI Feed
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
-  - deployment: SponsorConnect
-    displayName: SponsorConnect.dev
-    environment: SponsorConnect
+  - deployment: Publish to feed
     strategy:
       runOnce:
         deploy:

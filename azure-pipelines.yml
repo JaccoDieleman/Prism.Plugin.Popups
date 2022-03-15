@@ -28,9 +28,6 @@ variables:
   value: 'Any CPU'
 - name: BuildConfiguration
   value: Release
-- group: 'Code Signing'
-- group: 'GitHub Release'
-
 
 stages:
 - stage: build
